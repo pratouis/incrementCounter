@@ -102,7 +102,7 @@ app.post('/login',(req,res)=>{
 app.post('/increment',(req,res) => {
   const { token, number } = req.body;
   /* check if fields are valid */
-  if(!token || !number){
+  if(!token || number === undefined || number === null ){
     res.status(400).json({
       success: false,
       msg: "missing information"
@@ -119,7 +119,7 @@ app.post('/increment',(req,res) => {
         }else{
           res.status(200).json({
             success: true,
-            msg: "successfully incremented!"
+            msg: `successfully ${number ? 'incremented' : 'reset'}!`
           });
         }
       })
@@ -133,7 +133,37 @@ app.post('/increment',(req,res) => {
   }
 });
 
-
+app.get('/logout', (req,res) => {
+  /* check if fields are valid */
+  if(!req.query.token){
+    res.status(400).json({
+      success: false,
+      msg: "missing token"
+    });
+  }else{
+    Counter.findOneAndUpdate({ token: req.query.token }, { token: ""})
+    .then((counter) => {
+      if(!counter){
+        res.status(400).json({
+          success: false,
+          msg: "incorrect credentials"
+        });
+      }else{
+        res.status(200).json({
+          success: true,
+          msg: 'successfully logged out!'
+        });
+      }
+    })
+    .catch((err) =>
+      res.status(500).json({
+        success: false,
+        msg: "DB Failure",
+        err
+      })
+    );
+  }
+});
 
 app.listen(3000, () => {
   console.log("Listening on Port 3000");

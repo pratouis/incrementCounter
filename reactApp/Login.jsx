@@ -76,10 +76,9 @@ class LoginForm extends React.Component {
           </FormItem>
         : <pre />}
         <FormItem>
-          <Button type="primary" htmlType="submit" className="login-form-button">
+          <Button type="primary" htmlType="submit" className="login-form-button" style={{marginRight: '10px'}}>
             {this.state.isRegister ? "Register" : "Log In"}
           </Button>
-          <br/>
           Or <a href="" onClick={(e) => this.toggleLogin(e)}>{this.state.isRegister ? "login" : "register"} now!</a>
         </FormItem>
       </Form>

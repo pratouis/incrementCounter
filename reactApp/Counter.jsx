@@ -25,17 +25,18 @@ class Counter extends React.Component {
   }
 
   onIncrement() {
-    /*
-      It probably makes little computational difference to recalculate
-        max everytime increment is clicked
-    */
-      if(this.state.newNumber === this.state.number){
-        const newNumber = Math.max(this.state.number+1,this.state.number*2);
-        this.setState({ modalOpen: true, newNumber: newNumber });
-      }else{
-        this.setState({ modalOpen: true})
-      }
+    /* calculate newNumber before Modal opens */
+    const newNumber = Math.max(this.state.number+1,this.state.number*2);
+    this.setState({ modalOpen: true, newNumber: newNumber });
   }
+
+  /* since initial counter comes from parent component, re-render if there is
+      a change in counter props passed in to Counter component
+  */
+  componentWillReceiveProps(newprops){
+    this.setState({ number: newprops.counter });
+  }
+
 
   onConfirm() {
     /* make request to backend to augment our counter, providing token for authentication */

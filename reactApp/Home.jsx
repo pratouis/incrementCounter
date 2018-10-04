@@ -49,8 +49,47 @@ class Home extends React.Component {
       }
     });
   }
+
+  reset(){
+    axios.post(backendURL+'/increment', {token: this.state.creds, number: 0 })
+      .then(({data})=>{
+        if(data.success){
+          this.setState({ counter: 0 })
+        }
+      })
+      .catch((err) => {
+        if(err && err.response){
+          console.log(err.response.data.msg);
+        }
+      })
+  }
+
+  logout(){
+    axios.get(backendURL+'/logout?token='+this.state.creds)
+      .then(({data}) => {
+        if(data.success){
+          this.setState({ creds: null, username: 'Guest' })
+        }
+      })
+      .catch((err) => {
+        if(err && err.response){
+          console.log(err.response.data.msg);
+        }
+      })
+  }
+
   menuClick(e){
-    console.log(e);
+    switch(e.key){
+      case 'reset':
+        this.reset();
+        break;
+      case 'logout':
+        this.logout();
+        break;
+      default:
+        //do nothing
+        break;
+    }
   }
 
   render() {
@@ -70,6 +109,7 @@ class Home extends React.Component {
               <Menu.Item key="user" disabled>
                 <Icon type="user"/> Welcome {this.state.username}
               </Menu.Item>
+              {/* Reset and Logout are only click-able if user logged in */}
             <Menu.SubMenu
                 disabled={!!!this.state.creds}
                 title={<span className="submenu-title-wrapper"><Icon type="ellipsis" theme="outlined" />Options</span>}>
@@ -81,26 +121,6 @@ class Home extends React.Component {
                   </Menu.Item>
               </Menu.SubMenu>
             </Menu>
-            {/* {this.state.creds ?
-              (<h3>
-                <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
-                Welcome {this.state.username}
-              </h3>
-              ) : <h3>Increment Counter</h3>}
-              {this.state.creds ?
-    (            <div style={{display: 'flex', alignItems: 'flexEnd'}}>
-                  <Menu>
-                    <Menu.SubMenu
-                      title={
-                        <span className="submenu-title-wrapper">
-                          <Icon type="setting" />But What About...</span>}
-                      >
-                        <Menu.Item key="setting:1">Resetting Counter</Menu.Item>
-                        <Menu.Item key="setting:2">Logging Out</Menu.Item>
-                    </Menu.SubMenu>
-                    </Menu>
-                </div>)
-                : <pre />} */}
           </Header>
           <Content style={{height:'100%'}}>
             {/* Render Login page if not logged in, otherwise render counter */}
