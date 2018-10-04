@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Modal, Button } from 'antd';
 import axios from 'axios';
-const backendURL = 'http://localhost:3000';
+
 
 class Counter extends React.Component {
   constructor(props){
@@ -19,7 +19,7 @@ class Counter extends React.Component {
 
   onConfirm(e,x) {
     const newNumber = Math.max(this.state.number+1,this.state.number*2);
-    axios.post(backendURL + '/increment', { token: this.props.token, number: newNumber })
+    axios.post(this.props.URL + '/increment', { token: this.props.token, number: newNumber })
       .then(({data}) => {
         if(data.success){
           this.setState({modalOpen: false, number: newNumber})

@@ -1,6 +1,6 @@
 import React from 'react';
-
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import axios from 'axios';
+import { Form, Icon, Input, Button } from 'antd';
 
 const FormItem = Form.Item;
 
@@ -11,19 +11,25 @@ class LoginForm extends React.Component {
       isRegister: false
     };
   }
+
+  register(username, password){
+    axios.post(this.props.URL + '/register',{ username, password })
+      .then(({data}) => {
+        this.setState({ isRegister: false });
+      })
+      .catch((err) => {
+        console.log(err.response.data.msg);
+      });
+  }
+
   handleSubmit(e){
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         if(this.state.isRegister){
-          
-          axios.post(backendURL + '/register', { username, password })
-          .then(({data}) => {
-            this.setState({isRegister: false });
-          })
-          .catch((err) => {
-            console.log(err.response.data.msg);
-          });
+          if(values.password === values.repeatPassword){
+              this.register(values.username.trim(), values.password);
+          }
         }else{
           this.props.login(values.username.trim(), values.password);
         }
@@ -41,8 +47,7 @@ class LoginForm extends React.Component {
     return (
 
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
-      <h3 style={{padding: '20px'}}>Increment Counter</h3>
-      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px'}}>
       <Form onSubmit={(e) => this.handleSubmit(e)} className="login-form">
         <FormItem>
           {getFieldDecorator('username', {

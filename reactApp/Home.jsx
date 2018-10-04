@@ -6,8 +6,8 @@ import Login from './Login.jsx';
 import Counter from './Counter.jsx';
 
 const backendURL = 'http://localhost:3000';
-import { Layout, Header, Content } from 'antd';
-import { message } from 'antd';
+import { Layout, Icon, message } from 'antd';
+const { Header, Content } = Layout;
 
 class Home extends React.Component {
   constructor(props) {
@@ -41,7 +41,8 @@ class Home extends React.Component {
     {username, password}
   )
     .then(({data}) => {
-      this.setState({ creds: data.token, counter: data.counter });
+      console.log(username);
+      this.setState({ creds: data.token, counter: data.counter, username });
     })
     .catch((err) => {
       this.setState({messages: [err.response.data]})
@@ -55,8 +56,22 @@ class Home extends React.Component {
           {/* {this.state.messages.map((({success, msg}) =>
             success ? message.success(msg) : message.error(msg)
           ))} */}
+          <Header style={{background:'rgba(10,10,10,0.1)', display:'flex', justifyContent: 'center', alignItems: 'c'}}>
+            <h3>
+            {this.state.creds ?
+              (<div style={{paddingLeft: '10px'}}>
+                <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
+                Welcome {this.state.username}
+              </div>) : Increment Counter}
+            </h3>
+          </Header>
+          <Content style={{height:'100%'}}>
 
-          {this.state.creds ? <Counter token={this.state.creds} counter={this.state.counter} /> : <Login login={(user,pwd) => this.login(user,pwd)}/>}
+            {this.state.creds ?
+              <Counter URL={backendURL} token={this.state.creds} counter={this.state.counter} /> :
+              <Login URL={backendURL} login={(user,pwd) => this.login(user,pwd)}/>
+            }
+          </Content>
       </Layout>
     )
   }
