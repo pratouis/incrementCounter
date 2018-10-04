@@ -1,12 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 
-
 import Login from './Login.jsx';
 import Counter from './Counter.jsx';
 
 const backendURL = 'http://localhost:3000';
-import { Layout, Icon, message } from 'antd';
+import { Layout, Icon } from 'antd';
 const { Header, Content } = Layout;
 
 class Home extends React.Component {
@@ -14,15 +13,9 @@ class Home extends React.Component {
     super(props);
     this.state = {
       creds: null,
-      messages: [],
       counter: 0
     };
   }
-
-  // register(username, password){
-  //   axios.post(backendURL+'/register')
-  //     .then(({success, msg}) => )
-  // }
 
   login(username, password) {
     axios.post(backendURL + '/login',
@@ -45,7 +38,9 @@ class Home extends React.Component {
       this.setState({ creds: data.token, counter: data.counter, username });
     })
     .catch((err) => {
-      this.setState({messages: [err.response.data]})
+      if(err && err.response){
+        console.log(err.response.data);
+      }
     });
   }
 
@@ -53,17 +48,13 @@ class Home extends React.Component {
   render() {
     return (
       <Layout style={{height: '100%'}}>
-          {/* {this.state.messages.map((({success, msg}) =>
-            success ? message.success(msg) : message.error(msg)
-          ))} */}
           <Header style={{background:'rgba(10,10,10,0.1)', display:'flex', justifyContent: 'center', alignItems: 'c'}}>
-            <h3>
             {this.state.creds ?
-              (<div style={{paddingLeft: '10px'}}>
+              (<h3>
                 <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
                 Welcome {this.state.username}
-              </div>) : Increment Counter}
-            </h3>
+              </h3>
+              ) : <h3>Increment Counter</h3>}
           </Header>
           <Content style={{height:'100%'}}>
 

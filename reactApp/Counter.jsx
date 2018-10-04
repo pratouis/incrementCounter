@@ -9,22 +9,36 @@ class Counter extends React.Component {
     super(props);
     this.state = {
       number: this.props.counter,
-      modalOpen: false
+      modalOpen: false,
+      newNumber: 0
     }
   }
 
   onIncrement() {
-      this.setState({ modalOpen: true});
+    /* there was a bug where modal's animation is slower than the update of number,
+      so the next increment number is shown just after hitting confirm
+      therefore we need newNumber in our state
+      */
+      /*
+      It probably makes little computational difference to recalculate
+        max everytime increment is clicked
+    */
+      if(this.state.newNumber === this.state.number){
+        const newNumber = Math.max(this.state.number+1,this.state.number*2);
+        this.setState({ modalOpen: true, newNumber: newNumber });
+      }else{
+        this.setState({ modalOpen: true})
+      }
   }
 
-  onConfirm(e,x) {
-    const newNumber = Math.max(this.state.number+1,this.state.number*2);
-    axios.post(this.props.URL + '/increment', { token: this.props.token, number: newNumber })
+  onConfirm(e) {
+
+    axios.post(this.props.URL + '/increment', { token: this.props.token, number: this.state.newNumber })
       .then(({data}) => {
         if(data.success){
-          this.setState({modalOpen: false, number: newNumber})
+          this.setState({modalOpen: false, number: this.state.newNumber })
         }else{
-          console.log(data);
+          this.setState({modalOpen: false });
         }
       })
       .catch((err) => {
@@ -37,7 +51,6 @@ class Counter extends React.Component {
   }
 
   render() {
-    const newNumber = Math.max(this.state.number+1,this.state.number*2);
       return(
         <div style={{display: 'flex', justifyContent: 'center', height: '100%'}}>
 
@@ -46,15 +59,14 @@ class Counter extends React.Component {
             <Button type="primary" style={{float: 'right'}} onClick={(e) => this.onIncrement(e)}>Increment</Button>
           </div>
 
-
           <Modal
             title="Increment Counter"
             visible={this.state.modalOpen}
-            onOk={(e) => this.onConfirm(e,newNumber)}
+            onOk={(e) => this.onConfirm(e)}
             okText="Confirm"
             onCancel={(e) => this.onCancel(e)}
           >
-            <p>New Number: {newNumber}</p>
+            <p>New Number: {this.state.newNumber}</p>
           </Modal>
         </div>
       )
