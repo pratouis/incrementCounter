@@ -3,23 +3,29 @@ import React from 'react';
 import { Modal, Button } from 'antd';
 import axios from 'axios';
 
-
+/* Counter Page, keeping track of current count */
 class Counter extends React.Component {
   constructor(props){
     super(props);
+    /* props:
+      URL - to make axios call
+      token - to pass credentials
+      counter - to initialize Counter components count
+    */
     this.state = {
       number: this.props.counter,
       modalOpen: false,
       newNumber: 0
     }
+    /* NOTE about newNumber:
+      there was a bug where modal's animation is slower than the update of number,
+      so the next increment number is shown just after hitting confirm
+      therefore we need newNumber in our state
+    */
   }
 
   onIncrement() {
-    /* there was a bug where modal's animation is slower than the update of number,
-      so the next increment number is shown just after hitting confirm
-      therefore we need newNumber in our state
-      */
-      /*
+    /*
       It probably makes little computational difference to recalculate
         max everytime increment is clicked
     */
@@ -31,8 +37,8 @@ class Counter extends React.Component {
       }
   }
 
-  onConfirm(e) {
-
+  onConfirm() {
+    /* make request to backend to augment our counter, providing token for authentication */
     axios.post(this.props.URL + '/increment', { token: this.props.token, number: this.state.newNumber })
       .then(({data}) => {
         if(data.success){

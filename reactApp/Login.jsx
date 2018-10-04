@@ -11,20 +11,23 @@ class LoginForm extends React.Component {
       isRegister: false
     };
   }
-
+  /* register is internal to LoginForm, just toggling whether isRegister state */
   register(username, password){
     axios.post(this.props.URL + '/register',{ username, password })
       .then(({data}) => {
         this.setState({ isRegister: false });
       })
       .catch((err) => {
-        console.log(err.response.data.msg);
+        if(err && err.response){
+          // console.log(err.response.data.msg);
+        }
       });
   }
 
   handleSubmit(e){
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
+      /* if fields are not blank, make appropriate axios calls*/
       if (!err) {
         if(this.state.isRegister){
           if(values.password === values.repeatPassword){
