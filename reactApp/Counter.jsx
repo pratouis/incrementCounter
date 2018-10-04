@@ -5,12 +5,19 @@ class Counter extends React.Component {
     super(props);
 
     this.state = {
-      number: 0
+      number: 0,
+      modalOpen: false,
+      newNumber: 0
     }
   }
 
-  onClick() {
-      
+  onIncrement() {
+      const newNumber = Math.max(this.state.number+1,this.state.number*2);
+      this.setState({ modalOpen: true, newNumber });
+  }
+
+  onConfirm() {
+
   }
 
   render() {
@@ -19,8 +26,12 @@ class Counter extends React.Component {
 
           <div>
             <h1 >{this.state.number}</h1>
-            <button style={{float: 'right'}}>Increment</button>
+            <button style={{float: 'right'}} onClick={(e) => this.onIncrement(e)}>Increment</button>
+          </div>
 
+
+          <div>
+            {this.state.modalOpen ? `New Number: ${this.state.newNumber}` : ""}
           </div>
         </div>
       )
