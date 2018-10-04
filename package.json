@@ -1,0 +1,45 @@
+{
+  "name": "incrementcounter",
+  "version": "1.0.0",
+  "description": "incrementing counter for grio",
+  "main": "index.js",
+  "scripts": {
+    "webpack": "webpack",
+    "dev": "webpack-dev-server --content-base build/",
+    "start": "nodemon backend/server.js --exec babel-node --presets env"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratouis/incrementCounter.git"
+  },
+  "keywords": [
+    "express",
+    "react",
+    "antd"
+  ],
+  "author": "pratouis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pratouis/incrementCounter/issues"
+  },
+  "homepage": "https://github.com/pratouis/incrementCounter#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.1",
+    "express": "^4.16.3",
+    "mongoose": "^5.3.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "body-parser": "^1.18.3",
+    "nodemon": "^1.18.4",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  }
+}
