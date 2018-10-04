@@ -22,9 +22,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.get('/',(req,res)=>{
-  res.status(200).json({success: true, msg: "up and running"});
-})
 
 app.post('/register',(req,res)=>{
   const { username, password } = req.body;
@@ -55,11 +52,10 @@ app.post('/login',(req,res)=>{
   User.findOne({ username, password })
       .then((result) => {
         if(result){
-          console.log(result);
           return Counter.findOneAndUpdate(
             { user: result._id},
             { token: randtoken.generate(16) },
-            { upsert: true })
+            { upsert: true, new: true })
         }else{
           res.status(400).json({
             success: false,
@@ -68,11 +64,12 @@ app.post('/login',(req,res)=>{
         }
       })
       .then((updatedCounter) =>{
-          console.log(updatedCounter);
+        console.log('LOGIN SUCCESS\nNEW TOKEN: ',updatedCounter.token);
         res.status(200).json({
           success: true,
           msg: "successful login",
-          token: updatedCounter.token
+          token: updatedCounter.token,
+          counter: updatedCounter.counter
         })
       }
       )
@@ -97,7 +94,7 @@ app.post('/increment',(req,res) => {
     Counter.findOneAndUpdate({ token },{ counter: number })
     // Counter.findOneAndUpdate({ user, token },{ counter: number })
       .then((counter) => {
-        console.log(token, counter);
+        console.log('INSIDE /increment', token, counter);
         if(!counter){
           res.status(400).json({
             success: false,

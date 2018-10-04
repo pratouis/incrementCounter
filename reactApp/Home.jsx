@@ -14,7 +14,8 @@ class Home extends React.Component {
     super(props);
     this.state = {
       creds: null,
-      messages: []
+      messages: [],
+      counter: 0
     };
   }
 
@@ -40,22 +41,22 @@ class Home extends React.Component {
     {username, password}
   )
     .then(({data}) => {
-
-      this.setState({creds: data.token});
+      this.setState({ creds: data.token, counter: data.counter });
     })
     .catch((err) => {
       this.setState({messages: [err.response.data]})
     });
   }
 
+
   render() {
     return (
-      <Layout>
+      <Layout style={{height: '100%'}}>
           {/* {this.state.messages.map((({success, msg}) =>
             success ? message.success(msg) : message.error(msg)
           ))} */}
 
-          {this.state.creds ? <Counter /> : <Login login={(user,pwd) => this.login(user,pwd)}/>}
+          {this.state.creds ? <Counter token={this.state.creds} counter={this.state.counter} /> : <Login login={(user,pwd) => this.login(user,pwd)}/>}
       </Layout>
     )
   }

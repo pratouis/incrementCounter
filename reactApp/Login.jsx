@@ -15,11 +15,17 @@ class LoginForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
         if(this.state.isRegister){
-          console.error("REGISTER NOT IMPLEMENTED");
+          
+          axios.post(backendURL + '/register', { username, password })
+          .then(({data}) => {
+            this.setState({isRegister: false });
+          })
+          .catch((err) => {
+            console.log(err.response.data.msg);
+          });
         }else{
-          this.props.login(values.username.trim(), values.password.trim());
+          this.props.login(values.username.trim(), values.password);
         }
       }
     });
