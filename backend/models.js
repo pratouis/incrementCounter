@@ -6,9 +6,12 @@ const CounterSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  token: {
+    type: String
+  },
   counter: {
     type: Number,
-    required: true
+    default: 0
   }
 });
 

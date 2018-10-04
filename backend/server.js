@@ -1,5 +1,6 @@
 import express from 'express';
 import { hash, compare } from 'bcrypt';
+import randtoken from 'rand-token';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 
@@ -26,15 +27,95 @@ app.get('/',(req,res)=>{
 })
 
 app.post('/register',(req,res)=>{
-  
+  const { username, password, email } = req;
+  if(!username || !email || !password){
+    res.status(400).json({ success: false, msg: "Missing fields" });
+  }else{
+    User.findOne({ email })
+        .then((result)=>{
+          if(result){
+            res.status(400).json({ success: false, msg: "email already taken" });
+          }else{
+            return User.save({ username, email, password });
+          }
+        })
+        .then((save) => {
+          console.log(save);
+          res.status(200).json({ success: true, msg: "successful registration" });
+        })
+        .catch((err) =>
+        res.status(500).json({ success: false, msg: "DB Failure", err })
+        );
+  }
 });
 
 app.post('/login',(req,res)=>{
-  res.status(501).json({success: false, msg: "/login not implemented"});
+  const { email, password }
+  User.findOne({ email, password })
+      .then((result) => {
+        if(result){
+          return Counter.findOneAndUpdate(
+            { user: result._id},
+            { token: randtoken.generate(16) },
+            { upsert: true })
+        }else{
+          res.status(400).json({
+            success: false,
+            msg: "Login failed"
+          });
+        }
+      })
+      .then((updatedCounter) =>
+          res.status(200).json({
+            success: true,
+            msg: "successful login",
+            token: updatedCounter.token
+          });
+      )
+      .catch((err) =>
+        res.status(500).json({
+          success: false,
+          msg: "DB Failure",
+          err
+        });
+      );
 });
 
-app.post('/increment',(req,res) =>{
-  res.status(501).json({success: false, msg: "/increment not implemented"});
+app.post('/increment',(req,res) => {
+  const { token, user, number } = req;
+  if(!token || !user){
+    res.status(400).json({
+      success: false,
+      msg: "missing credentials"
+    })
+  }else if(!number){
+    res.status(400).json({
+      success: false,
+      msg: "missing number"
+    });
+  }else{
+    Counter.findOneAndUpdate({ user, token },{ counter: number })
+      .then((counter) => {
+        if(!counter){
+          res.status(400).json({
+            success: false,
+            msg: "incorrect credentials"
+          });
+        }else{
+          res.status(200).json({
+            success: true,
+            msg: "successfully incremented!"
+          });
+        }
+      })
+      .catch((err) =>
+        res.status(500).json({
+          success: false,
+          msg: "DB Failure",
+          err
+        });
+      );
+  }
 });
 
 
