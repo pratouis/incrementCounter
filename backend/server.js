@@ -57,7 +57,6 @@ app.post('/register',(req,res)=>{
 
 app.post('/login',(req,res)=>{
   const { username, password } = req.body;
-  const { username, password } = req.body;
   /* checking if fields are valid inputs */
   if(!username || !password){
     res.status(400).json({ success: false, msg: "Missing fields" });
