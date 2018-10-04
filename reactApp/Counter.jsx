@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { Modal, Button } from 'antd';
+
+
 class Counter extends React.Component {
   constructor(props){
     super(props);
@@ -24,7 +27,7 @@ class Counter extends React.Component {
       return(
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
-          <div>
+          <div style={{alignItems: 'center'}}>
             <h1 >{this.state.number}</h1>
             <button style={{float: 'right'}} onClick={(e) => this.onIncrement(e)}>Increment</button>
           </div>

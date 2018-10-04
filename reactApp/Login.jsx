@@ -16,6 +16,11 @@ class LoginForm extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
+        if(this.state.isRegister){
+          console.error("REGISTER NOT IMPLEMENTED");
+        }else{
+          this.props.login(values.username.trim(), values.password.trim());
+        }
       }
     });
   }
@@ -34,7 +39,7 @@ class LoginForm extends React.Component {
       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
       <Form onSubmit={(e) => this.handleSubmit(e)} className="login-form">
         <FormItem>
-          {getFieldDecorator('userName', {
+          {getFieldDecorator('username', {
             rules: [{ required: true, message: 'Please input your username!' }],
           })(
             <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />

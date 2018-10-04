@@ -28,6 +28,6 @@ const UserSchema = new mongoose.Schema({
 });
 
 const Counter = mongoose.model('Counter',CounterSchema);
-const User = mongoosemodel('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 module.exports = { Counter, User };

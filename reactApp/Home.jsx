@@ -1,30 +1,62 @@
 import React from 'react';
 import axios from 'axios';
 
+
 import Login from './Login.jsx';
 import Counter from './Counter.jsx';
 
 const backendURL = 'http://localhost:3000';
+import { Layout, Header, Content } from 'antd';
+import { message } from 'antd';
 
 class Home extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      creds: null
+      creds: null,
+      messages: []
     };
   }
 
-  register(username, password){
-    axios.post(backendURL+'/register')
-  }
+  // register(username, password){
+  //   axios.post(backendURL+'/register')
+  //     .then(({success, msg}) => )
+  // }
 
-  login(username, password){
+  login(username, password) {
+    axios.post(backendURL + '/login',
+    // {
+    //   headers: {
+    //     'Access-Control-Allow-Origin': '*',
+    //     'Content-Type' : 'application/json'
+    //   },
+    //   withCredentials: true,
+    //   credentials: 'same-origin',
+    //   data: {
+    //     username,
+    //     password
+    //   }
+    // }
+    {username, password}
+  )
+    .then(({data}) => {
 
+      this.setState({creds: data.token});
+    })
+    .catch((err) => {
+      this.setState({messages: [err.response.data]})
+    });
   }
 
   render() {
     return (
+      <Layout>
+          {/* {this.state.messages.map((({success, msg}) =>
+            success ? message.success(msg) : message.error(msg)
+          ))} */}
 
+          {this.state.creds ? <Counter /> : <Login login={(user,pwd) => this.login(user,pwd)}/>}
+      </Layout>
     )
   }
 }
