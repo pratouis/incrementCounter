@@ -62,13 +62,13 @@ app.post('/login',(req,res)=>{
     res.status(400).json({ success: false, msg: "Missing fields" });
   }else{
     User.findOne({ username, password })
-        .then((result) => {
-          if(result){
+        .then((userDoc) => {
+          if(userDoc){
             /* update or insert Counter record with newly generated token,
                 returning new document upon succes
              */
             return Counter.findOneAndUpdate(
-              { user: result._id},
+              { user: userDoc._id},
               { token: randtoken.generate(16) },
               { upsert: true, new: true })
           }else{
@@ -99,18 +99,35 @@ app.post('/login',(req,res)=>{
       }
 });
 
-app.post('/increment',(req,res) => {
-  const { token, number } = req.body;
-  /* check if fields are valid */
-  if(!token || number === undefined || number === null ){
+app.get('/increment', (req,res) => {
+  const { token, counter } = req.query;
+  if(!token || counter === null || counter === undefined){
     res.status(400).json({
       success: false,
       msg: "missing information"
     });
   }else{
-    Counter.findOneAndUpdate({ token },{ counter: number })
-      .then((counter) => {
-        if(!counter){
+    console.log('in GET /increment')
+    res.status(200).json({
+      success: true,
+      msg: 'suggesting new count',
+      newCount: Math.max(1, counter*2)
+    });
+  }
+})
+
+app.post('/increment',(req,res) => {
+  const { token, counter } = req.body;
+  /* check if fields are valid */
+  if(!token || counter === undefined || counter === null ){
+    res.status(400).json({
+      success: false,
+      msg: "missing information"
+    });
+  }else{
+    Counter.findOneAndUpdate({ token },{ counter })
+      .then((counterDoc) => {
+        if(!counterDoc){
           /* an empty or null counter means token incorrect */
           res.status(400).json({
             success: false,
@@ -119,7 +136,7 @@ app.post('/increment',(req,res) => {
         }else{
           res.status(200).json({
             success: true,
-            msg: `successfully ${number ? 'incremented' : 'reset'}!`
+            msg: `successfully ${counter ? 'incremented' : 'reset'}!`
           });
         }
       })
@@ -141,9 +158,12 @@ app.get('/logout', (req,res) => {
       msg: "missing token"
     });
   }else{
+    /* "securetly" logs out a person by removing their "session" token from DB
+    *   prevents altering counter with old token after someone has logged out
+    */
     Counter.findOneAndUpdate({ token: req.query.token }, { token: ""})
-    .then((counter) => {
-      if(!counter){
+    .then((counterDoc) => {
+      if(!counterDoc){
         res.status(400).json({
           success: false,
           msg: "incorrect credentials"

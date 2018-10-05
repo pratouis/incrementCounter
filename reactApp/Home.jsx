@@ -51,7 +51,8 @@ class Home extends React.Component {
   }
 
   reset(){
-    axios.post(backendURL+'/increment', {token: this.state.creds, number: 0 })
+    /* write 0 to backend, and update front-end counter */
+    axios.post(backendURL+'/increment', {token: this.state.creds, counter: 0 })
       .then(({data})=>{
         if(data.success){
           this.setState({ counter: 0 })
@@ -98,6 +99,7 @@ class Home extends React.Component {
           <Header style={{background:'rgba(10,10,10,0.1)', display:'flex', alignItems: 'flex-end', justifyContent: 'center'}}>
             {/*  Show generic title if user not logged in*/}
             <Menu
+              selectedKeys={[]}
               style={{background: 'initial', display: 'flex'}}
               onClick={(e) => this.menuClick(e)}
               mode="horizontal"

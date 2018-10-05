@@ -26,8 +26,17 @@ class Counter extends React.Component {
 
   onIncrement() {
     /* calculate newNumber before Modal opens */
-    const newNumber = Math.max(this.state.number+1,this.state.number*2);
-    this.setState({ modalOpen: true, newNumber: newNumber });
+    axios.get(`${this.props.URL}/increment?token=${this.props.token}&counter=${this.state.number}`)
+      .then(({data}) => {
+        if(data.success){
+          this.setState({ modalOpen: true, newNumber: data.newCount });
+        }
+      })
+      .catch((err) => {
+        if(err && err.response){
+          console.log(err.response.data.msg);
+        }
+      })
   }
 
   /* since initial counter comes from parent component, re-render if there is
@@ -40,7 +49,7 @@ class Counter extends React.Component {
 
   onConfirm() {
     /* make request to backend to augment our counter, providing token for authentication */
-    axios.post(this.props.URL + '/increment', { token: this.props.token, number: this.state.newNumber })
+    axios.post(this.props.URL + '/increment', { token: this.props.token, counter: this.state.newNumber })
       .then(({data}) => {
         if(data.success){
           this.setState({modalOpen: false, number: this.state.newNumber })

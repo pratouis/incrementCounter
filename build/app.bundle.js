@@ -55631,9 +55631,20 @@ var Counter = function (_React$Component) {
   _createClass(Counter, [{
     key: 'onIncrement',
     value: function onIncrement() {
+      var _this2 = this;
+
       /* calculate newNumber before Modal opens */
-      var newNumber = Math.max(this.state.number + 1, this.state.number * 2);
-      this.setState({ modalOpen: true, newNumber: newNumber });
+      _axios2.default.get(this.props.URL + '/increment?token=' + this.props.token + '&counter=' + this.state.number).then(function (_ref) {
+        var data = _ref.data;
+
+        if (data.success) {
+          _this2.setState({ modalOpen: true, newNumber: data.newCount });
+        }
+      }).catch(function (err) {
+        if (err && err.response) {
+          console.log(err.response.data.msg);
+        }
+      });
     }
 
     /* since initial counter comes from parent component, re-render if there is
@@ -55648,19 +55659,19 @@ var Counter = function (_React$Component) {
   }, {
     key: 'onConfirm',
     value: function onConfirm() {
-      var _this2 = this;
+      var _this3 = this;
 
       /* make request to backend to augment our counter, providing token for authentication */
-      _axios2.default.post(this.props.URL + '/increment', { token: this.props.token, number: this.state.newNumber }).then(function (_ref) {
-        var data = _ref.data;
+      _axios2.default.post(this.props.URL + '/increment', { token: this.props.token, counter: this.state.newNumber }).then(function (_ref2) {
+        var data = _ref2.data;
 
         if (data.success) {
-          _this2.setState({ modalOpen: false, number: _this2.state.newNumber });
+          _this3.setState({ modalOpen: false, number: _this3.state.newNumber });
         } else {
-          _this2.setState({ modalOpen: false });
+          _this3.setState({ modalOpen: false });
         }
       }).catch(function (err) {
-        _this2.setState({ modalOpen: false });
+        _this3.setState({ modalOpen: false });
       });
     }
   }, {
@@ -55671,7 +55682,7 @@ var Counter = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _react2.default.createElement(
         'div',
@@ -55687,7 +55698,7 @@ var Counter = function (_React$Component) {
           _react2.default.createElement(
             _button2.default,
             { type: 'primary', style: { float: 'right' }, onClick: function onClick(e) {
-                return _this3.onIncrement(e);
+                return _this4.onIncrement(e);
               } },
             'Increment'
           )
@@ -55698,11 +55709,11 @@ var Counter = function (_React$Component) {
             title: 'Increment Counter',
             visible: this.state.modalOpen,
             onOk: function onOk(e) {
-              return _this3.onConfirm(e);
+              return _this4.onConfirm(e);
             },
             okText: 'Confirm',
             onCancel: function onCancel(e) {
-              return _this3.onCancel(e);
+              return _this4.onCancel(e);
             }
           },
           _react2.default.createElement(
@@ -55842,7 +55853,7 @@ var Home = function (_React$Component) {
     value: function reset() {
       var _this3 = this;
 
-      _axios2.default.post(backendURL + '/increment', { token: this.state.creds, number: 0 }).then(function (_ref2) {
+      _axios2.default.post(backendURL + '/increment', { token: this.state.creds, counter: 0 }).then(function (_ref2) {
         var data = _ref2.data;
 
         if (data.success) {
@@ -55900,6 +55911,7 @@ var Home = function (_React$Component) {
           _react2.default.createElement(
             _menu2.default,
             {
+              selectedKeys: [],
               style: { background: 'initial', display: 'flex' },
               onClick: function onClick(e) {
                 return _this5.menuClick(e);
