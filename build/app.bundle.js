@@ -55693,6 +55693,7 @@ var Counter = function (_React$Component) {
           _react2.default.createElement(
             _button2.default,
             { disabled: true },
+            'Count: ',
             this.state.number
           ),
           _react2.default.createElement(
@@ -55853,6 +55854,7 @@ var Home = function (_React$Component) {
     value: function reset() {
       var _this3 = this;
 
+      /* write 0 to backend, and update front-end counter */
       _axios2.default.post(backendURL + '/increment', { token: this.state.creds, counter: 0 }).then(function (_ref2) {
         var data = _ref2.data;
 

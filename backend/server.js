@@ -34,7 +34,7 @@ app.post('/register',(req,res)=>{
   const { username, password } = req.body;
   /* checking if fields are valid inputs */
   if(!username || !password){
-    res.status(400).json({ success: false, msg: "Missing fields" });
+    res.status(400).json({ success: false, msg: "missing information: invalid username or password" });
   }else{
     /* checking if username taken */
     User.findOne({ username })
@@ -59,43 +59,48 @@ app.post('/login',(req,res)=>{
   const { username, password } = req.body;
   /* checking if fields are valid inputs */
   if(!username || !password){
-    res.status(400).json({ success: false, msg: "Missing fields" });
+    res.status(400).json({ success: false, msg: "missing fields: invalid username or password" });
   }else{
-    User.findOne({ username, password })
+    User.findOne({ username})
         .then((userDoc) => {
           if(userDoc){
-            /* update or insert Counter record with newly generated token,
-                returning new document upon succes
-             */
-            return Counter.findOneAndUpdate(
-              { user: userDoc._id},
-              { token: randtoken.generate(16) },
-              { upsert: true, new: true })
+            if(userDoc.password !== password){
+              res.status(400).json({
+                success: false,
+                msg: "incorrect password"
+              });
+            }else{
+              /* update or insert Counter record with newly generated token,
+                returning new document upon success */
+              Counter.findOneAndUpdate(
+                { user: userDoc._id},
+                { token: randtoken.generate(16) },
+                { upsert: true, new: true }
+              ).then((updatedCounter) => {
+                /* send token, to be used for authentication during current "session",
+                   and counter, to initialize number on frontend  */
+                res.status(200).json({
+                  success: true,
+                  msg: "successful login",
+                  token: updatedCounter.token,
+                  counter: updatedCounter.counter
+                })
+              })
+            }
           }else{
             res.status(400).json({
               success: false,
-              msg: "Login failed"
+              msg: "username does not exist"
             });
           }
         })
-        .then((updatedCounter) =>{
-          /* send token, to be used for authentication during current "session",
-            * and old counter
-           */
-          res.status(200).json({
-            success: true,
-            msg: "successful login",
-            token: updatedCounter.token,
-            counter: updatedCounter.counter || 0
-          })
-        })
-        .catch((err) =>
+        .catch((err) => {
           res.status(500).json({
             success: false,
             msg: "DB Failure",
             err
           })
-        );
+        });
       }
 });
 
@@ -104,10 +109,9 @@ app.get('/increment', (req,res) => {
   if(!token || counter === null || counter === undefined){
     res.status(400).json({
       success: false,
-      msg: "missing information"
+      msg: "missing fields: invalid token or counter"
     });
   }else{
-    console.log('in GET /increment')
     res.status(200).json({
       success: true,
       msg: 'suggesting new count',
@@ -122,7 +126,7 @@ app.post('/increment',(req,res) => {
   if(!token || counter === undefined || counter === null ){
     res.status(400).json({
       success: false,
-      msg: "missing information"
+      msg: "missing fields: invalid token or counter"
     });
   }else{
     Counter.findOneAndUpdate({ token },{ counter })
@@ -140,13 +144,13 @@ app.post('/increment',(req,res) => {
           });
         }
       })
-      .catch((err) =>
+      .catch((err) => {
         res.status(500).json({
           success: false,
           msg: "DB Failure",
           err
         })
-      );
+      });
   }
 });
 
@@ -155,7 +159,7 @@ app.get('/logout', (req,res) => {
   if(!req.query.token){
     res.status(400).json({
       success: false,
-      msg: "missing token"
+      msg: "missing fields: invalid token"
     });
   }else{
     /* "securetly" logs out a person by removing their "session" token from DB
@@ -175,13 +179,13 @@ app.get('/logout', (req,res) => {
         });
       }
     })
-    .catch((err) =>
+    .catch((err) => {
       res.status(500).json({
         success: false,
         msg: "DB Failure",
         err
       })
-    );
+    });
   }
 });
 

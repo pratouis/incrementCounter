@@ -7,19 +7,31 @@ const FormItem = Form.Item;
 class LoginForm extends React.Component {
   constructor(props){
     super(props);
+    /* props:
+      URL - to make axios call
+      login - handles axios login request and token storage
+      notification - function that shows error messages
+    */
     this.state = {
       isRegister: false
     };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.toggleLogin = this.toggleLogin.bind(this);
+
   }
   /* register is internal to LoginForm, just toggling whether isRegister state */
   register(username, password){
     axios.post(this.props.URL + '/register',{ username, password })
       .then(({data}) => {
         this.setState({ isRegister: false });
+        this.props.notification('success', 'Register Success', err.response.data.msg);
+
       })
       .catch((err) => {
         if(err && err.response){
-          // console.log(err.response.data.msg);
+          this.props.notification('error', 'Unable to Register', err.response.data.msg);
+        }else{
+          this.props.notification('error', 'Network Error', 'check server connection')
         }
       });
   }
@@ -32,6 +44,8 @@ class LoginForm extends React.Component {
         if(this.state.isRegister){
           if(values.password === values.repeatPassword){
               this.register(values.username.trim(), values.password);
+          }else{
+            this.props.notification('error', 'Unable to Register', 'passwords don\'t match');
           }
         }else{
           this.props.login(values.username.trim(), values.password);
@@ -51,7 +65,7 @@ class LoginForm extends React.Component {
 
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px'}}>
-      <Form onSubmit={(e) => this.handleSubmit(e)} className="login-form">
+      <Form onSubmit={this.handleSubmit} className="login-form">
         <FormItem>
           {getFieldDecorator('username', {
             rules: [{ required: true, message: 'Please input your username!' }],
@@ -79,7 +93,7 @@ class LoginForm extends React.Component {
           <Button type="primary" htmlType="submit" className="login-form-button" style={{marginRight: '10px'}}>
             {this.state.isRegister ? "Register" : "Log In"}
           </Button>
-          Or <a href="" onClick={(e) => this.toggleLogin(e)}>{this.state.isRegister ? "login" : "register"} now!</a>
+          Or <a href="" onClick={this.toggleLogin}>{this.state.isRegister ? "login" : "register"} now!</a>
         </FormItem>
       </Form>
       </div>

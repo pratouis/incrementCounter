@@ -11,30 +11,30 @@ class Counter extends React.Component {
       URL - to make axios call
       token - to pass credentials
       counter - to initialize Counter components count
+      notification - function that shows error messages
     */
     this.state = {
       number: this.props.counter,
       modalOpen: false,
       newNumber: 0
     }
-    /* NOTE about newNumber:
-      there was a bug where modal's animation is slower than the update of number,
-      so the next increment number is shown just after hitting confirm
-      therefore we need newNumber in our state
-    */
+    this.onIncrement = this.onIncrement.bind(this);
+    this.onConfirm = this.onConfirm.bind(this);
+    this.onCancel = this.onCancel.bind(this);
   }
 
   onIncrement() {
     /* calculate newNumber before Modal opens */
     axios.get(`${this.props.URL}/increment?token=${this.props.token}&counter=${this.state.number}`)
-      .then(({data}) => {
-        if(data.success){
-          this.setState({ modalOpen: true, newNumber: data.newCount });
-        }
-      })
+      .then(({data}) =>
+        this.setState({ modalOpen: true, newNumber: data.newCount })
+      )
       .catch((err) => {
+        /* if server is not running, might run into trouble*/
         if(err && err.response){
-          console.log(err.response.data.msg);
+          this.props.notification('error', 'Unable to Get Next Count', err.response.data.msg);
+        }else{
+          this.props.notification('error', 'Network Error', 'check server connection');
         }
       })
   }
@@ -50,20 +50,21 @@ class Counter extends React.Component {
   onConfirm() {
     /* make request to backend to augment our counter, providing token for authentication */
     axios.post(this.props.URL + '/increment', { token: this.props.token, counter: this.state.newNumber })
-      .then(({data}) => {
-        if(data.success){
-          this.setState({modalOpen: false, number: this.state.newNumber })
-        }else{
-          this.setState({modalOpen: false });
-        }
-      })
+      .then(({data}) =>
+        this.setState({ modalOpen: false, number: this.state.newNumber })
+      )
       .catch((err) => {
-        this.setState({modalOpen: false});
+        if(err && err.response){
+          this.props.notification('error', 'Unable to Increment', err.response.data.msg);
+        }else{
+          this.props.notification('error', 'Network Error', 'check server connection');
+        }
+        this.setState({ modalOpen: false });
       })
   }
 
-  onCancel(e) {
-    this.setState({modalOpen: false});
+  onCancel() {
+    this.setState({ modalOpen: false });
   }
 
   render() {
@@ -71,16 +72,16 @@ class Counter extends React.Component {
         <div style={{display: 'flex', justifyContent: 'center', height: '100%'}}>
 
           <div style={{display: 'flex', alignItems: 'center'}}>
-            <Button disabled>{this.state.number}</Button>
-            <Button type="primary" style={{float: 'right'}} onClick={(e) => this.onIncrement(e)}>Increment</Button>
+            <Button disabled>Count: {this.state.number}</Button>
+            <Button type="primary" style={{float: 'right'}} onClick={this.onIncrement}>Increment</Button>
           </div>
 
           <Modal
             title="Increment Counter"
             visible={this.state.modalOpen}
-            onOk={(e) => this.onConfirm(e)}
+            onOk={this.onConfirm}
             okText="Confirm"
-            onCancel={(e) => this.onCancel(e)}
+            onCancel={this.onCancel}
           >
             <p>New Number: {this.state.newNumber}</p>
           </Modal>

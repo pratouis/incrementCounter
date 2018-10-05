@@ -6,9 +6,11 @@ import Counter from './Counter.jsx';
 
 /* backendURL is passed to other components as argument, we can update easily */
 const backendURL = 'http://localhost:3000';
-import { Layout, Icon, Menu } from 'antd';
+import { Layout, Icon, Menu, notification } from 'antd';
 const { Header, Content } = Layout;
-
+notification.config({
+  duration: 2,
+});
 
 /* main app, controlling flow of what we see */
 class Home extends React.Component {
@@ -19,48 +21,44 @@ class Home extends React.Component {
       counter: 0,
       username: 'Guest'
     };
+    this.login = this.login.bind(this);
+    this.menuClick = this.menuClick.bind(this);
   }
 
+  openNotificationWithIcon(type, title, msg){
+    notification[type]({
+      message: title,
+      description: msg,
+    });
+  };
+
   login(username, password) {
-    axios.post(backendURL + '/login',
-    // {
-    //   headers: {
-    //     'Access-Control-Allow-Origin': '*',
-    //     'Content-Type' : 'application/json'
-    //   },
-    //   withCredentials: true,
-    //   credentials: 'same-origin',
-    //   data: {
-    //     username,
-    //     password
-    //   }
-    // }
-    {username, password}
-  )
+    axios.post(backendURL + '/login',{username, password})
     .then(({data}) => {
-      /*
-        on successful login, update creds, username, and counter
-      */
+      /*  on successful login, update creds, username, and counter */
       this.setState({ creds: data.token, counter: data.counter, username });
+      // this.openNotificationWithIcon('info', 'Login', data.msg)
     })
     .catch((err) => {
       if(err && err.response){
-        // console.log(err.response.data);
+        this.openNotificationWithIcon('error', 'Login', err.response.data.msg)
+      }else{
+        this.openNotificationWithIcon('error', 'Network Error', 'check server connection')
       }
     });
   }
-
   reset(){
     /* write 0 to backend, and update front-end counter */
     axios.post(backendURL+'/increment', {token: this.state.creds, counter: 0 })
       .then(({data})=>{
-        if(data.success){
-          this.setState({ counter: 0 })
-        }
+        this.setState({ counter: 0 })
+        this.openNotificationWithIcon('success', 'Counter Reset', data.msg);
       })
       .catch((err) => {
         if(err && err.response){
-          console.log(err.response.data.msg);
+          this.openNotificationWithIcon('error', 'Unable to Reset', data.msg);
+        }else{
+          this.openNotificationWithIcon('error', 'Network Error', 'check server connection')
         }
       })
   }
@@ -68,13 +66,15 @@ class Home extends React.Component {
   logout(){
     axios.get(backendURL+'/logout?token='+this.state.creds)
       .then(({data}) => {
-        if(data.success){
-          this.setState({ creds: null, username: 'Guest' })
-        }
+        this.setState({ creds: null, username: 'Guest' })
+        // this.openNotificationWithIcon('info', 'Logout', data.msg)
       })
       .catch((err) => {
         if(err && err.response){
-          console.log(err.response.data.msg);
+          // return err.response.data
+          this.openNotificationWithIcon('error', 'Logout', data.msg)
+        }else{
+          this.openNotificationWithIcon('error', 'Network Error', 'check server connection')
         }
       })
   }
@@ -101,7 +101,7 @@ class Home extends React.Component {
             <Menu
               selectedKeys={[]}
               style={{background: 'initial', display: 'flex'}}
-              onClick={(e) => this.menuClick(e)}
+              onClick={this.menuClick}
               mode="horizontal"
             >
               <Menu.Item key="heading" disabled>
@@ -127,8 +127,17 @@ class Home extends React.Component {
           <Content style={{height:'100%'}}>
             {/* Render Login page if not logged in, otherwise render counter */}
             {this.state.creds ?
-              <Counter URL={backendURL} token={this.state.creds} counter={this.state.counter} /> :
-              <Login URL={backendURL} login={(user,pwd) => this.login(user,pwd)}/>
+              <Counter
+                URL={backendURL}
+                token={this.state.creds}
+                counter={this.state.counter}
+                notification={this.openNotificationWithIcon}
+              /> :
+              <Login
+                URL={backendURL}
+                login={this.login}
+                notification={this.openNotificationWithIcon}
+              />
             }
           </Content>
       </Layout>
