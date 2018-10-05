@@ -24,8 +24,7 @@ class LoginForm extends React.Component {
     axios.post(this.props.URL + '/register',{ username, password })
       .then(({data}) => {
         this.setState({ isRegister: false });
-        this.props.notification('success', 'Register Success', err.response.data.msg);
-
+        this.props.notification('success', 'Register Success', data.msg);
       })
       .catch((err) => {
         if(err && err.response){

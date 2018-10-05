@@ -56420,7 +56420,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* Main App of Frontend, controlling flow of login and counter */
+
+/* Child components*/
+
 
 /* backendURL is passed to other components as argument, we can update easily */
 var backendURL = 'http://localhost:3000';
@@ -56450,6 +56453,9 @@ var Home = function (_React$Component) {
     _this.menuClick = _this.menuClick.bind(_this);
     return _this;
   }
+
+  /* function that triggers notification of a certain type */
+
 
   _createClass(Home, [{
     key: 'openNotificationWithIcon',
@@ -56701,7 +56707,7 @@ var LoginForm = function (_React$Component) {
         var data = _ref.data;
 
         _this2.setState({ isRegister: false });
-        _this2.props.notification('success', 'Register Success', err.response.data.msg);
+        _this2.props.notification('success', 'Register Success', data.msg);
       }).catch(function (err) {
         if (err && err.response) {
           _this2.props.notification('error', 'Unable to Register', err.response.data.msg);
