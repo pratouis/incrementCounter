@@ -8226,6 +8226,247 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/antd/lib/notification/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/antd/lib/notification/index.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends2 = __webpack_require__(/*! babel-runtime/helpers/extends */ "./node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var React = _interopRequireWildcard(_react);
+
+var _rcNotification = __webpack_require__(/*! rc-notification */ "./node_modules/rc-notification/es/index.js");
+
+var _rcNotification2 = _interopRequireDefault(_rcNotification);
+
+var _icon = __webpack_require__(/*! ../icon */ "./node_modules/antd/lib/icon/index.js");
+
+var _icon2 = _interopRequireDefault(_icon);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var notificationInstance = {};
+var defaultDuration = 4.5;
+var defaultTop = 24;
+var defaultBottom = 24;
+var defaultPlacement = 'topRight';
+var defaultGetContainer = void 0;
+function setNotificationConfig(options) {
+    var duration = options.duration,
+        placement = options.placement,
+        bottom = options.bottom,
+        top = options.top,
+        getContainer = options.getContainer;
+
+    if (duration !== undefined) {
+        defaultDuration = duration;
+    }
+    if (placement !== undefined) {
+        defaultPlacement = placement;
+    }
+    if (bottom !== undefined) {
+        defaultBottom = bottom;
+    }
+    if (top !== undefined) {
+        defaultTop = top;
+    }
+    if (getContainer !== undefined) {
+        defaultGetContainer = getContainer;
+    }
+}
+function getPlacementStyle(placement) {
+    var style = void 0;
+    switch (placement) {
+        case 'topLeft':
+            style = {
+                left: 0,
+                top: defaultTop,
+                bottom: 'auto'
+            };
+            break;
+        case 'topRight':
+            style = {
+                right: 0,
+                top: defaultTop,
+                bottom: 'auto'
+            };
+            break;
+        case 'bottomLeft':
+            style = {
+                left: 0,
+                top: 'auto',
+                bottom: defaultBottom
+            };
+            break;
+        default:
+            style = {
+                right: 0,
+                top: 'auto',
+                bottom: defaultBottom
+            };
+            break;
+    }
+    return style;
+}
+function getNotificationInstance(prefixCls, placement, callback) {
+    var cacheKey = prefixCls + '-' + placement;
+    if (notificationInstance[cacheKey]) {
+        callback(notificationInstance[cacheKey]);
+        return;
+    }
+    _rcNotification2['default'].newInstance({
+        prefixCls: prefixCls,
+        className: prefixCls + '-' + placement,
+        style: getPlacementStyle(placement),
+        getContainer: defaultGetContainer,
+        closeIcon: React.createElement(_icon2['default'], { className: prefixCls + '-close-icon', type: 'close' })
+    }, function (notification) {
+        notificationInstance[cacheKey] = notification;
+        callback(notification);
+    });
+}
+var typeToIcon = {
+    success: 'check-circle-o',
+    info: 'info-circle-o',
+    error: 'close-circle-o',
+    warning: 'exclamation-circle-o'
+};
+function notice(args) {
+    var outerPrefixCls = args.prefixCls || 'ant-notification';
+    var prefixCls = outerPrefixCls + '-notice';
+    var duration = args.duration === undefined ? defaultDuration : args.duration;
+    var iconNode = null;
+    if (args.icon) {
+        iconNode = React.createElement(
+            'span',
+            { className: prefixCls + '-icon' },
+            args.icon
+        );
+    } else if (args.type) {
+        var iconType = typeToIcon[args.type];
+        iconNode = React.createElement(_icon2['default'], { className: prefixCls + '-icon ' + prefixCls + '-icon-' + args.type, type: iconType });
+    }
+    var autoMarginTag = !args.description && iconNode ? React.createElement('span', { className: prefixCls + '-message-single-line-auto-margin' }) : null;
+    getNotificationInstance(outerPrefixCls, args.placement || defaultPlacement, function (notification) {
+        notification.notice({
+            content: React.createElement(
+                'div',
+                { className: iconNode ? prefixCls + '-with-icon' : '' },
+                iconNode,
+                React.createElement(
+                    'div',
+                    { className: prefixCls + '-message' },
+                    autoMarginTag,
+                    args.message
+                ),
+                React.createElement(
+                    'div',
+                    { className: prefixCls + '-description' },
+                    args.description
+                ),
+                args.btn ? React.createElement(
+                    'span',
+                    { className: prefixCls + '-btn' },
+                    args.btn
+                ) : null
+            ),
+            duration: duration,
+            closable: true,
+            onClose: args.onClose,
+            key: args.key,
+            style: args.style || {},
+            className: args.className
+        });
+    });
+}
+var api = {
+    open: notice,
+    close: function close(key) {
+        Object.keys(notificationInstance).forEach(function (cacheKey) {
+            return notificationInstance[cacheKey].removeNotice(key);
+        });
+    },
+
+    config: setNotificationConfig,
+    destroy: function destroy() {
+        Object.keys(notificationInstance).forEach(function (cacheKey) {
+            notificationInstance[cacheKey].destroy();
+            delete notificationInstance[cacheKey];
+        });
+    }
+};
+['success', 'info', 'warning', 'error'].forEach(function (type) {
+    api[type] = function (args) {
+        return api.open((0, _extends3['default'])({}, args, { type: type }));
+    };
+});
+api.warn = api.warning;
+exports['default'] = api;
+module.exports = exports['default'];
+
+/***/ }),
+
+/***/ "./node_modules/antd/lib/notification/style/index.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/antd/lib/notification/style/index.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! ../../style/index.less */ "./node_modules/antd/lib/style/index.less");
+
+__webpack_require__(/*! ./index.less */ "./node_modules/antd/lib/notification/style/index.less");
+
+/***/ }),
+
+/***/ "./node_modules/antd/lib/notification/style/index.less":
+/*!*************************************************************!*\
+  !*** ./node_modules/antd/lib/notification/style/index.less ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../css-loader!../../../../less-loader/dist/cjs.js??ref--5-2!./index.less */ "./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js?!./node_modules/antd/lib/notification/style/index.less");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/antd/lib/style/index.less":
 /*!************************************************!*\
   !*** ./node_modules/antd/lib/style/index.less ***!
@@ -16351,6 +16592,25 @@ exports = module.exports = __webpack_require__(/*! ../../../../css-loader/lib/cs
 
 // module
 exports.push([module.i, "/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */\n/* stylelint-disable no-duplicate-selectors */\n/* stylelint-disable */\n/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */\n.ant-modal {\n  font-family: \"Chinese Quote\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  font-size: 14px;\n  font-variant: tabular-nums;\n  line-height: 1.5;\n  color: rgba(0, 0, 0, 0.65);\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  position: relative;\n  width: auto;\n  margin: 0 auto;\n  top: 100px;\n  padding-bottom: 24px;\n}\n.ant-modal-wrap {\n  position: fixed;\n  overflow: auto;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1000;\n  -webkit-overflow-scrolling: touch;\n  outline: 0;\n}\n.ant-modal-title {\n  margin: 0;\n  font-size: 16px;\n  line-height: 22px;\n  font-weight: 500;\n  color: rgba(0, 0, 0, 0.85);\n}\n.ant-modal-content {\n  position: relative;\n  background-color: #fff;\n  border: 0;\n  border-radius: 4px;\n  background-clip: padding-box;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n}\n.ant-modal-close {\n  cursor: pointer;\n  border: 0;\n  background: transparent;\n  position: absolute;\n  right: 0;\n  top: 0;\n  z-index: 10;\n  font-weight: 700;\n  line-height: 1;\n  text-decoration: none;\n  transition: color 0.3s;\n  color: rgba(0, 0, 0, 0.45);\n  outline: 0;\n  padding: 0;\n}\n.ant-modal-close-x {\n  display: block;\n  font-style: normal;\n  vertical-align: baseline;\n  text-align: center;\n  text-transform: none;\n  text-rendering: auto;\n  width: 56px;\n  height: 56px;\n  line-height: 56px;\n  font-size: 16px;\n}\n.ant-modal-close:focus,\n.ant-modal-close:hover {\n  color: #444;\n  text-decoration: none;\n}\n.ant-modal-header {\n  padding: 16px 24px;\n  border-radius: 4px 4px 0 0;\n  background: #fff;\n  color: rgba(0, 0, 0, 0.65);\n  border-bottom: 1px solid #e8e8e8;\n}\n.ant-modal-body {\n  padding: 24px;\n  font-size: 14px;\n  line-height: 1.5;\n  word-wrap: break-word;\n}\n.ant-modal-footer {\n  border-top: 1px solid #e8e8e8;\n  padding: 10px 16px;\n  text-align: right;\n  border-radius: 0 0 4px 4px;\n}\n.ant-modal-footer button + button {\n  margin-left: 8px;\n  margin-bottom: 0;\n}\n.ant-modal.zoom-enter,\n.ant-modal.zoom-appear {\n  animation-duration: 0.3s;\n  transform: none;\n  opacity: 0;\n  user-select: none;\n}\n.ant-modal-mask {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  background-color: rgba(0, 0, 0, 0.65);\n  height: 100%;\n  z-index: 1000;\n  filter: alpha(opacity=50);\n}\n.ant-modal-mask-hidden {\n  display: none;\n}\n.ant-modal-open {\n  overflow: hidden;\n}\n.ant-modal-centered {\n  text-align: center;\n}\n.ant-modal-centered:before {\n  content: '';\n  display: inline-block;\n  height: 100%;\n  vertical-align: middle;\n  width: 0;\n}\n.ant-modal-centered .ant-modal {\n  display: inline-block;\n  vertical-align: middle;\n  top: 0;\n  text-align: left;\n}\n@media (max-width: 767px) {\n  .ant-modal {\n    width: auto !important;\n    margin: 10px;\n  }\n  .ant-modal-centered .ant-modal {\n    flex: 1;\n  }\n}\n.ant-confirm .ant-modal-header {\n  display: none;\n}\n.ant-confirm .ant-modal-close {\n  display: none;\n}\n.ant-confirm .ant-modal-body {\n  padding: 32px 32px 24px;\n}\n.ant-confirm-body-wrapper {\n  zoom: 1;\n}\n.ant-confirm-body-wrapper:before,\n.ant-confirm-body-wrapper:after {\n  content: \"\";\n  display: table;\n}\n.ant-confirm-body-wrapper:after {\n  clear: both;\n}\n.ant-confirm-body .ant-confirm-title {\n  color: rgba(0, 0, 0, 0.85);\n  font-weight: 500;\n  font-size: 16px;\n  line-height: 1.4;\n  display: block;\n  overflow: hidden;\n}\n.ant-confirm-body .ant-confirm-content {\n  margin-left: 38px;\n  font-size: 14px;\n  color: rgba(0, 0, 0, 0.65);\n  margin-top: 8px;\n}\n.ant-confirm-body > .anticon {\n  font-size: 22px;\n  margin-right: 16px;\n  float: left;\n}\n.ant-confirm .ant-confirm-btns {\n  margin-top: 24px;\n  float: right;\n}\n.ant-confirm .ant-confirm-btns button + button {\n  margin-left: 8px;\n  margin-bottom: 0;\n}\n.ant-confirm-error .ant-confirm-body > .anticon {\n  color: #f5222d;\n}\n.ant-confirm-warning .ant-confirm-body > .anticon,\n.ant-confirm-confirm .ant-confirm-body > .anticon {\n  color: #faad14;\n}\n.ant-confirm-info .ant-confirm-body > .anticon {\n  color: #1890ff;\n}\n.ant-confirm-success .ant-confirm-body > .anticon {\n  color: #52c41a;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js?!./node_modules/antd/lib/notification/style/index.less":
+/*!****************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/less-loader/dist/cjs.js??ref--5-2!./node_modules/antd/lib/notification/style/index.less ***!
+  \****************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */\n/* stylelint-disable no-duplicate-selectors */\n/* stylelint-disable */\n/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */\n.ant-notification {\n  font-family: \"Chinese Quote\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  font-size: 14px;\n  font-variant: tabular-nums;\n  line-height: 1.5;\n  color: rgba(0, 0, 0, 0.65);\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  position: fixed;\n  z-index: 1010;\n  width: 384px;\n  max-width: calc(100vw - 32px);\n  margin-right: 24px;\n}\n.ant-notification-topLeft,\n.ant-notification-bottomLeft {\n  margin-left: 24px;\n  margin-right: 0;\n}\n.ant-notification-topLeft .ant-notification-fade-enter.ant-notification-fade-enter-active,\n.ant-notification-bottomLeft .ant-notification-fade-enter.ant-notification-fade-enter-active,\n.ant-notification-topLeft .ant-notification-fade-appear.ant-notification-fade-appear-active,\n.ant-notification-bottomLeft .ant-notification-fade-appear.ant-notification-fade-appear-active {\n  animation-name: NotificationLeftFadeIn;\n}\n.ant-notification-close-icon {\n  font-size: 14px;\n  cursor: pointer;\n}\n.ant-notification-notice {\n  padding: 16px 24px;\n  border-radius: 4px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  background: #fff;\n  line-height: 1.5;\n  position: relative;\n  margin-bottom: 16px;\n  overflow: hidden;\n}\n.ant-notification-notice-message {\n  font-size: 16px;\n  color: rgba(0, 0, 0, 0.85);\n  margin-bottom: 8px;\n  line-height: 24px;\n  display: inline-block;\n}\n.ant-notification-notice-message-single-line-auto-margin {\n  width: calc(384px - 24px * 2 - 24px - 48px - 100%);\n  background-color: transparent;\n  pointer-events: none;\n  display: block;\n  max-width: 4px;\n}\n.ant-notification-notice-message-single-line-auto-margin:before {\n  content: '';\n  display: block;\n}\n.ant-notification-notice-description {\n  font-size: 14px;\n}\n.ant-notification-notice-closable .ant-notification-notice-message {\n  padding-right: 24px;\n}\n.ant-notification-notice-with-icon .ant-notification-notice-message {\n  font-size: 16px;\n  margin-left: 48px;\n  margin-bottom: 4px;\n}\n.ant-notification-notice-with-icon .ant-notification-notice-description {\n  margin-left: 48px;\n  font-size: 14px;\n}\n.ant-notification-notice-icon {\n  position: absolute;\n  font-size: 24px;\n  line-height: 24px;\n  margin-left: 4px;\n}\n.ant-notification-notice-icon-success {\n  color: #52c41a;\n}\n.ant-notification-notice-icon-info {\n  color: #1890ff;\n}\n.ant-notification-notice-icon-warning {\n  color: #faad14;\n}\n.ant-notification-notice-icon-error {\n  color: #f5222d;\n}\n.ant-notification-notice-close {\n  position: absolute;\n  right: 22px;\n  top: 16px;\n  color: rgba(0, 0, 0, 0.45);\n  outline: none;\n}\na.ant-notification-notice-close:focus {\n  text-decoration: none;\n}\n.ant-notification-notice-close:hover {\n  color: rgba(0, 0, 0, 0.67);\n}\n.ant-notification-notice-btn {\n  float: right;\n  margin-top: 16px;\n}\n.ant-notification .notification-fade-effect {\n  animation-duration: 0.24s;\n  animation-fill-mode: both;\n  animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);\n}\n.ant-notification-fade-enter,\n.ant-notification-fade-appear {\n  opacity: 0;\n  animation-duration: 0.24s;\n  animation-fill-mode: both;\n  animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);\n  animation-play-state: paused;\n}\n.ant-notification-fade-leave {\n  animation-duration: 0.24s;\n  animation-fill-mode: both;\n  animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);\n  animation-duration: 0.2s;\n  animation-play-state: paused;\n}\n.ant-notification-fade-enter.ant-notification-fade-enter-active,\n.ant-notification-fade-appear.ant-notification-fade-appear-active {\n  animation-name: NotificationFadeIn;\n  animation-play-state: running;\n}\n.ant-notification-fade-leave.ant-notification-fade-leave-active {\n  animation-name: NotificationFadeOut;\n  animation-play-state: running;\n}\n@keyframes NotificationFadeIn {\n  0% {\n    opacity: 0;\n    left: 384px;\n  }\n  100% {\n    left: 0;\n    opacity: 1;\n  }\n}\n@keyframes NotificationLeftFadeIn {\n  0% {\n    opacity: 0;\n    right: 384px;\n  }\n  100% {\n    right: 0;\n    opacity: 1;\n  }\n}\n@keyframes NotificationFadeOut {\n  0% {\n    opacity: 1;\n    margin-bottom: 16px;\n    padding-top: 16px 24px;\n    padding-bottom: 16px 24px;\n    max-height: 150px;\n  }\n  100% {\n    opacity: 0;\n    margin-bottom: 0;\n    padding-top: 0;\n    padding-bottom: 0;\n    max-height: 0;\n  }\n}\n", ""]);
 
 // exports
 
@@ -28734,6 +28994,375 @@ var setWidth = function setWidth(elem, width) {
     elem.style.width = width;
   }
 };
+
+/***/ }),
+
+/***/ "./node_modules/rc-notification/es/Notice.js":
+/*!***************************************************!*\
+  !*** ./node_modules/rc-notification/es/Notice.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babel-runtime/helpers/defineProperty */ "./node_modules/babel-runtime/helpers/defineProperty.js");
+/* harmony import */ var babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babel-runtime/helpers/classCallCheck */ "./node_modules/babel-runtime/helpers/classCallCheck.js");
+/* harmony import */ var babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! babel-runtime/helpers/createClass */ "./node_modules/babel-runtime/helpers/createClass.js");
+/* harmony import */ var babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! babel-runtime/helpers/possibleConstructorReturn */ "./node_modules/babel-runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! babel-runtime/helpers/inherits */ "./node_modules/babel-runtime/helpers/inherits.js");
+/* harmony import */ var babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_7__);
+
+
+
+
+
+
+
+
+
+var Notice = function (_Component) {
+  babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(Notice, _Component);
+
+  function Notice() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Notice);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, (_ref = Notice.__proto__ || Object.getPrototypeOf(Notice)).call.apply(_ref, [this].concat(args))), _this), _this.close = function () {
+      _this.clearCloseTimer();
+      _this.props.onClose();
+    }, _this.startCloseTimer = function () {
+      if (_this.props.duration) {
+        _this.closeTimer = setTimeout(function () {
+          _this.close();
+        }, _this.props.duration * 1000);
+      }
+    }, _this.clearCloseTimer = function () {
+      if (_this.closeTimer) {
+        clearTimeout(_this.closeTimer);
+        _this.closeTimer = null;
+      }
+    }, _temp), babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(_this, _ret);
+  }
+
+  babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Notice, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.startCloseTimer();
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.duration !== prevProps.duration || this.props.update) {
+        this.restartCloseTimer();
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.clearCloseTimer();
+    }
+  }, {
+    key: 'restartCloseTimer',
+    value: function restartCloseTimer() {
+      this.clearCloseTimer();
+      this.startCloseTimer();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _className;
+
+      var props = this.props;
+      var componentClass = props.prefixCls + '-notice';
+      var className = (_className = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_className, '' + componentClass, 1), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_className, componentClass + '-closable', props.closable), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_className, props.className, !!props.className), _className);
+      return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(
+        'div',
+        { className: classnames__WEBPACK_IMPORTED_MODULE_6___default()(className), style: props.style, onMouseEnter: this.clearCloseTimer,
+          onMouseLeave: this.startCloseTimer
+        },
+        react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(
+          'div',
+          { className: componentClass + '-content' },
+          props.children
+        ),
+        props.closable ? react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(
+          'a',
+          { tabIndex: '0', onClick: this.close, className: componentClass + '-close' },
+          props.closeIcon || react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement('span', { className: componentClass + '-close-x' })
+        ) : null
+      );
+    }
+  }]);
+
+  return Notice;
+}(react__WEBPACK_IMPORTED_MODULE_5__["Component"]);
+
+Notice.propTypes = {
+  duration: prop_types__WEBPACK_IMPORTED_MODULE_7___default.a.number,
+  onClose: prop_types__WEBPACK_IMPORTED_MODULE_7___default.a.func,
+  children: prop_types__WEBPACK_IMPORTED_MODULE_7___default.a.any,
+  update: prop_types__WEBPACK_IMPORTED_MODULE_7___default.a.bool,
+  closeIcon: prop_types__WEBPACK_IMPORTED_MODULE_7___default.a.node
+};
+Notice.defaultProps = {
+  onEnd: function onEnd() {},
+  onClose: function onClose() {},
+
+  duration: 1.5,
+  style: {
+    right: '50%'
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (Notice);
+
+/***/ }),
+
+/***/ "./node_modules/rc-notification/es/Notification.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/rc-notification/es/Notification.js ***!
+  \*********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var babel_runtime_helpers_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babel-runtime/helpers/objectWithoutProperties */ "./node_modules/babel-runtime/helpers/objectWithoutProperties.js");
+/* harmony import */ var babel_runtime_helpers_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babel-runtime/helpers/defineProperty */ "./node_modules/babel-runtime/helpers/defineProperty.js");
+/* harmony import */ var babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! babel-runtime/helpers/extends */ "./node_modules/babel-runtime/helpers/extends.js");
+/* harmony import */ var babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! babel-runtime/helpers/classCallCheck */ "./node_modules/babel-runtime/helpers/classCallCheck.js");
+/* harmony import */ var babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! babel-runtime/helpers/createClass */ "./node_modules/babel-runtime/helpers/createClass.js");
+/* harmony import */ var babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! babel-runtime/helpers/possibleConstructorReturn */ "./node_modules/babel-runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! babel-runtime/helpers/inherits */ "./node_modules/babel-runtime/helpers/inherits.js");
+/* harmony import */ var babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var rc_animate__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! rc-animate */ "./node_modules/rc-animate/es/Animate.js");
+/* harmony import */ var rc_util_es_createChainedFunction__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! rc-util/es/createChainedFunction */ "./node_modules/rc-util/es/createChainedFunction.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _Notice__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Notice */ "./node_modules/rc-notification/es/Notice.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var seed = 0;
+var now = Date.now();
+
+function getUuid() {
+  return 'rcNotification_' + now + '_' + seed++;
+}
+
+var Notification = function (_Component) {
+  babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default()(Notification, _Component);
+
+  function Notification() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3___default()(this, Notification);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_5___default()(this, (_ref = Notification.__proto__ || Object.getPrototypeOf(Notification)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+      notices: []
+    }, _this.add = function (notice) {
+      var key = notice.key = notice.key || getUuid();
+      var maxCount = _this.props.maxCount;
+
+      _this.setState(function (previousState) {
+        var notices = previousState.notices;
+        var noticeIndex = notices.map(function (v) {
+          return v.key;
+        }).indexOf(key);
+        var updatedNotices = notices.concat();
+        if (noticeIndex !== -1) {
+          updatedNotices.splice(noticeIndex, 1, notice);
+        } else {
+          if (maxCount && notices.length >= maxCount) {
+                                                notice.updateKey = updatedNotices[0].updateKey || updatedNotices[0].key;
+            updatedNotices.shift();
+          }
+          updatedNotices.push(notice);
+        }
+        return {
+          notices: updatedNotices
+        };
+      });
+    }, _this.remove = function (key) {
+      _this.setState(function (previousState) {
+        return {
+          notices: previousState.notices.filter(function (notice) {
+            return notice.key !== key;
+          })
+        };
+      });
+    }, _temp), babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_5___default()(_this, _ret);
+  }
+
+  babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4___default()(Notification, [{
+    key: 'getTransitionName',
+    value: function getTransitionName() {
+      var props = this.props;
+      var transitionName = props.transitionName;
+      if (!transitionName && props.animation) {
+        transitionName = props.prefixCls + '-' + props.animation;
+      }
+      return transitionName;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this,
+          _className;
+
+      var props = this.props;
+      var notices = this.state.notices;
+
+      var noticeNodes = notices.map(function (notice, index) {
+        var update = Boolean(index === notices.length - 1 && notice.updateKey);
+        var key = notice.updateKey ? notice.updateKey : notice.key;
+        var onClose = Object(rc_util_es_createChainedFunction__WEBPACK_IMPORTED_MODULE_11__["default"])(_this2.remove.bind(_this2, notice.key), notice.onClose);
+        return react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(
+          _Notice__WEBPACK_IMPORTED_MODULE_13__["default"],
+          babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_2___default()({
+            prefixCls: props.prefixCls
+          }, notice, {
+            key: key,
+            update: update,
+            onClose: onClose,
+            closeIcon: props.closeIcon
+          }),
+          notice.content
+        );
+      });
+      var className = (_className = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1___default()(_className, props.prefixCls, 1), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1___default()(_className, props.className, !!props.className), _className);
+      return react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(
+        'div',
+        { className: classnames__WEBPACK_IMPORTED_MODULE_12___default()(className), style: props.style },
+        react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(
+          rc_animate__WEBPACK_IMPORTED_MODULE_10__["default"],
+          { transitionName: this.getTransitionName() },
+          noticeNodes
+        )
+      );
+    }
+  }]);
+
+  return Notification;
+}(react__WEBPACK_IMPORTED_MODULE_7__["Component"]);
+
+Notification.propTypes = {
+  prefixCls: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.string,
+  transitionName: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.string,
+  animation: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.string, prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.object]),
+  style: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.object,
+  maxCount: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.number,
+  closeIcon: prop_types__WEBPACK_IMPORTED_MODULE_8___default.a.node
+};
+Notification.defaultProps = {
+  prefixCls: 'rc-notification',
+  animation: 'fade',
+  style: {
+    top: 65,
+    left: '50%'
+  }
+};
+
+
+Notification.newInstance = function newNotificationInstance(properties, callback) {
+  var _ref2 = properties || {},
+      getContainer = _ref2.getContainer,
+      props = babel_runtime_helpers_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0___default()(_ref2, ['getContainer']);
+
+  var div = document.createElement('div');
+  if (getContainer) {
+    var root = getContainer();
+    root.appendChild(div);
+  } else {
+    document.body.appendChild(div);
+  }
+  var called = false;
+  function ref(notification) {
+    if (called) {
+      return;
+    }
+    called = true;
+    callback({
+      notice: function notice(noticeProps) {
+        notification.add(noticeProps);
+      },
+      removeNotice: function removeNotice(key) {
+        notification.remove(key);
+      },
+
+      component: notification,
+      destroy: function destroy() {
+        react_dom__WEBPACK_IMPORTED_MODULE_9___default.a.unmountComponentAtNode(div);
+        div.parentNode.removeChild(div);
+      }
+    });
+  }
+  react_dom__WEBPACK_IMPORTED_MODULE_9___default.a.render(react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(Notification, babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_2___default()({}, props, { ref: ref })), div);
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Notification);
+
+/***/ }),
+
+/***/ "./node_modules/rc-notification/es/index.js":
+/*!**************************************************!*\
+  !*** ./node_modules/rc-notification/es/index.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Notification__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Notification */ "./node_modules/rc-notification/es/Notification.js");
+
+/* harmony default export */ __webpack_exports__["default"] = (_Notification__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /***/ }),
 
@@ -55613,6 +56242,7 @@ var Counter = function (_React$Component) {
       URL - to make axios call
       token - to pass credentials
       counter - to initialize Counter components count
+      notification - function that shows error messages
     */
     var _this = _possibleConstructorReturn(this, (Counter.__proto__ || Object.getPrototypeOf(Counter)).call(this, props));
 
@@ -55620,12 +56250,11 @@ var Counter = function (_React$Component) {
       number: _this.props.counter,
       modalOpen: false,
       newNumber: 0
-      /* NOTE about newNumber:
-        there was a bug where modal's animation is slower than the update of number,
-        so the next increment number is shown just after hitting confirm
-        therefore we need newNumber in our state
-      */
-    };return _this;
+    };
+    _this.onIncrement = _this.onIncrement.bind(_this);
+    _this.onConfirm = _this.onConfirm.bind(_this);
+    _this.onCancel = _this.onCancel.bind(_this);
+    return _this;
   }
 
   _createClass(Counter, [{
@@ -55636,13 +56265,13 @@ var Counter = function (_React$Component) {
       /* calculate newNumber before Modal opens */
       _axios2.default.get(this.props.URL + '/increment?token=' + this.props.token + '&counter=' + this.state.number).then(function (_ref) {
         var data = _ref.data;
-
-        if (data.success) {
-          _this2.setState({ modalOpen: true, newNumber: data.newCount });
-        }
+        return _this2.setState({ modalOpen: true, newNumber: data.newCount });
       }).catch(function (err) {
+        /* if server is not running, might run into trouble*/
         if (err && err.response) {
-          console.log(err.response.data.msg);
+          _this2.props.notification('error', 'Unable to Get Next Count', err.response.data.msg);
+        } else {
+          _this2.props.notification('error', 'Network Error', 'check server connection');
         }
       });
     }
@@ -55664,26 +56293,24 @@ var Counter = function (_React$Component) {
       /* make request to backend to augment our counter, providing token for authentication */
       _axios2.default.post(this.props.URL + '/increment', { token: this.props.token, counter: this.state.newNumber }).then(function (_ref2) {
         var data = _ref2.data;
-
-        if (data.success) {
-          _this3.setState({ modalOpen: false, number: _this3.state.newNumber });
-        } else {
-          _this3.setState({ modalOpen: false });
-        }
+        return _this3.setState({ modalOpen: false, number: _this3.state.newNumber });
       }).catch(function (err) {
+        if (err && err.response) {
+          _this3.props.notification('error', 'Unable to Increment', err.response.data.msg);
+        } else {
+          _this3.props.notification('error', 'Network Error', 'check server connection');
+        }
         _this3.setState({ modalOpen: false });
       });
     }
   }, {
     key: 'onCancel',
-    value: function onCancel(e) {
+    value: function onCancel() {
       this.setState({ modalOpen: false });
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
-
       return _react2.default.createElement(
         'div',
         { style: { display: 'flex', justifyContent: 'center', height: '100%' } },
@@ -55698,9 +56325,7 @@ var Counter = function (_React$Component) {
           ),
           _react2.default.createElement(
             _button2.default,
-            { type: 'primary', style: { float: 'right' }, onClick: function onClick(e) {
-                return _this4.onIncrement(e);
-              } },
+            { type: 'primary', style: { float: 'right' }, onClick: this.onIncrement },
             'Increment'
           )
         ),
@@ -55709,13 +56334,9 @@ var Counter = function (_React$Component) {
           {
             title: 'Increment Counter',
             visible: this.state.modalOpen,
-            onOk: function onOk(e) {
-              return _this4.onConfirm(e);
-            },
+            onOk: this.onConfirm,
             okText: 'Confirm',
-            onCancel: function onCancel(e) {
-              return _this4.onCancel(e);
-            }
+            onCancel: this.onCancel
           },
           _react2.default.createElement(
             'p',
@@ -55759,6 +56380,10 @@ var _menu = __webpack_require__(/*! antd/lib/menu */ "./node_modules/antd/lib/me
 
 var _menu2 = _interopRequireDefault(_menu);
 
+var _notification2 = __webpack_require__(/*! antd/lib/notification */ "./node_modules/antd/lib/notification/index.js");
+
+var _notification3 = _interopRequireDefault(_notification2);
+
 var _layout = __webpack_require__(/*! antd/lib/layout */ "./node_modules/antd/lib/layout/index.js");
 
 var _layout2 = _interopRequireDefault(_layout);
@@ -55768,6 +56393,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 __webpack_require__(/*! antd/lib/icon/style */ "./node_modules/antd/lib/icon/style/index.js");
 
 __webpack_require__(/*! antd/lib/menu/style */ "./node_modules/antd/lib/menu/style/index.js");
+
+__webpack_require__(/*! antd/lib/notification/style */ "./node_modules/antd/lib/notification/style/index.js");
 
 __webpack_require__(/*! antd/lib/layout/style */ "./node_modules/antd/lib/layout/style/index.js");
 
@@ -55800,6 +56427,10 @@ var backendURL = 'http://localhost:3000';
 var Header = _layout2.default.Header,
     Content = _layout2.default.Content;
 
+_notification3.default.config({
+  duration: 2
+});
+
 /* main app, controlling flow of what we see */
 
 var Home = function (_React$Component) {
@@ -55815,37 +56446,35 @@ var Home = function (_React$Component) {
       counter: 0,
       username: 'Guest'
     };
+    _this.login = _this.login.bind(_this);
+    _this.menuClick = _this.menuClick.bind(_this);
     return _this;
   }
 
   _createClass(Home, [{
+    key: 'openNotificationWithIcon',
+    value: function openNotificationWithIcon(type, title, msg) {
+      _notification3.default[type]({
+        message: title,
+        description: msg
+      });
+    }
+  }, {
     key: 'login',
     value: function login(username, password) {
       var _this2 = this;
 
-      _axios2.default.post(backendURL + '/login',
-      // {
-      //   headers: {
-      //     'Access-Control-Allow-Origin': '*',
-      //     'Content-Type' : 'application/json'
-      //   },
-      //   withCredentials: true,
-      //   credentials: 'same-origin',
-      //   data: {
-      //     username,
-      //     password
-      //   }
-      // }
-      { username: username, password: password }).then(function (_ref) {
+      _axios2.default.post(backendURL + '/login', { username: username, password: password }).then(function (_ref) {
         var data = _ref.data;
 
-        /*
-          on successful login, update creds, username, and counter
-        */
+        /*  on successful login, update creds, username, and counter */
         _this2.setState({ creds: data.token, counter: data.counter, username: username });
+        // this.openNotificationWithIcon('info', 'Login', data.msg)
       }).catch(function (err) {
         if (err && err.response) {
-          // console.log(err.response.data);
+          _this2.openNotificationWithIcon('error', 'Login', err.response.data.msg);
+        } else {
+          _this2.openNotificationWithIcon('error', 'Network Error', 'check server connection');
         }
       });
     }
@@ -55858,12 +56487,13 @@ var Home = function (_React$Component) {
       _axios2.default.post(backendURL + '/increment', { token: this.state.creds, counter: 0 }).then(function (_ref2) {
         var data = _ref2.data;
 
-        if (data.success) {
-          _this3.setState({ counter: 0 });
-        }
+        _this3.setState({ counter: 0 });
+        _this3.openNotificationWithIcon('success', 'Counter Reset', data.msg);
       }).catch(function (err) {
         if (err && err.response) {
-          console.log(err.response.data.msg);
+          _this3.openNotificationWithIcon('error', 'Unable to Reset', data.msg);
+        } else {
+          _this3.openNotificationWithIcon('error', 'Network Error', 'check server connection');
         }
       });
     }
@@ -55875,12 +56505,14 @@ var Home = function (_React$Component) {
       _axios2.default.get(backendURL + '/logout?token=' + this.state.creds).then(function (_ref3) {
         var data = _ref3.data;
 
-        if (data.success) {
-          _this4.setState({ creds: null, username: 'Guest' });
-        }
+        _this4.setState({ creds: null, username: 'Guest' });
+        // this.openNotificationWithIcon('info', 'Logout', data.msg)
       }).catch(function (err) {
         if (err && err.response) {
-          console.log(err.response.data.msg);
+          // return err.response.data
+          _this4.openNotificationWithIcon('error', 'Logout', data.msg);
+        } else {
+          _this4.openNotificationWithIcon('error', 'Network Error', 'check server connection');
         }
       });
     }
@@ -55902,8 +56534,6 @@ var Home = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
-
       return _react2.default.createElement(
         _layout2.default,
         { style: { height: '100%' } },
@@ -55915,9 +56545,7 @@ var Home = function (_React$Component) {
             {
               selectedKeys: [],
               style: { background: 'initial', display: 'flex' },
-              onClick: function onClick(e) {
-                return _this5.menuClick(e);
-              },
+              onClick: this.menuClick,
               mode: 'horizontal'
             },
             _react2.default.createElement(
@@ -55960,9 +56588,16 @@ var Home = function (_React$Component) {
         _react2.default.createElement(
           Content,
           { style: { height: '100%' } },
-          this.state.creds ? _react2.default.createElement(_Counter2.default, { URL: backendURL, token: this.state.creds, counter: this.state.counter }) : _react2.default.createElement(_Login2.default, { URL: backendURL, login: function login(user, pwd) {
-              return _this5.login(user, pwd);
-            } })
+          this.state.creds ? _react2.default.createElement(_Counter2.default, {
+            URL: backendURL,
+            token: this.state.creds,
+            counter: this.state.counter,
+            notification: this.openNotificationWithIcon
+          }) : _react2.default.createElement(_Login2.default, {
+            URL: backendURL,
+            login: this.login,
+            notification: this.openNotificationWithIcon
+          })
         )
       );
     }
@@ -56039,11 +56674,19 @@ var LoginForm = function (_React$Component) {
   function LoginForm(props) {
     _classCallCheck(this, LoginForm);
 
+    /* props:
+      URL - to make axios call
+      login - handles axios login request and token storage
+      notification - function that shows error messages
+    */
     var _this = _possibleConstructorReturn(this, (LoginForm.__proto__ || Object.getPrototypeOf(LoginForm)).call(this, props));
 
     _this.state = {
       isRegister: false
     };
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    _this.toggleLogin = _this.toggleLogin.bind(_this);
+
     return _this;
   }
   /* register is internal to LoginForm, just toggling whether isRegister state */
@@ -56058,9 +56701,12 @@ var LoginForm = function (_React$Component) {
         var data = _ref.data;
 
         _this2.setState({ isRegister: false });
+        _this2.props.notification('success', 'Register Success', err.response.data.msg);
       }).catch(function (err) {
         if (err && err.response) {
-          // console.log(err.response.data.msg);
+          _this2.props.notification('error', 'Unable to Register', err.response.data.msg);
+        } else {
+          _this2.props.notification('error', 'Network Error', 'check server connection');
         }
       });
     }
@@ -56076,6 +56722,8 @@ var LoginForm = function (_React$Component) {
           if (_this3.state.isRegister) {
             if (values.password === values.repeatPassword) {
               _this3.register(values.username.trim(), values.password);
+            } else {
+              _this3.props.notification('error', 'Unable to Register', 'passwords don\'t match');
             }
           } else {
             _this3.props.login(values.username.trim(), values.password);
@@ -56092,8 +56740,6 @@ var LoginForm = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
-
       var getFieldDecorator = this.props.form.getFieldDecorator;
 
       return _react2.default.createElement(
@@ -56104,9 +56750,7 @@ var LoginForm = function (_React$Component) {
           { style: { display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' } },
           _react2.default.createElement(
             _form2.default,
-            { onSubmit: function onSubmit(e) {
-                return _this4.handleSubmit(e);
-              }, className: 'login-form' },
+            { onSubmit: this.handleSubmit, className: 'login-form' },
             _react2.default.createElement(
               FormItem,
               null,
@@ -56139,9 +56783,7 @@ var LoginForm = function (_React$Component) {
               'Or ',
               _react2.default.createElement(
                 'a',
-                { href: '', onClick: function onClick(e) {
-                    return _this4.toggleLogin(e);
-                  } },
+                { href: '', onClick: this.toggleLogin },
                 this.state.isRegister ? "login" : "register",
                 ' now!'
               )

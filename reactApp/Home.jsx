@@ -1,8 +1,12 @@
+/* Main App of Frontend, controlling flow of login and counter */
+
 import React from 'react';
 import axios from 'axios';
 
+/* Child components*/
 import Login from './Login.jsx';
 import Counter from './Counter.jsx';
+
 
 /* backendURL is passed to other components as argument, we can update easily */
 const backendURL = 'http://localhost:3000';
@@ -25,6 +29,7 @@ class Home extends React.Component {
     this.menuClick = this.menuClick.bind(this);
   }
 
+  /* function that triggers notification of a certain type */
   openNotificationWithIcon(type, title, msg){
     notification[type]({
       message: title,

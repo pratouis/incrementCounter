@@ -29,7 +29,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-
 app.post('/register',(req,res)=>{
   const { username, password } = req.body;
   /* checking if fields are valid inputs */
@@ -43,11 +42,10 @@ app.post('/register',(req,res)=>{
             res.status(400).json({ success: false, msg: "username already taken" });
           }else{
             const newUser = new User({ username, password })
-            return newUser.save();
+            newUser.save().then(() => {
+              res.status(200).json({ success: true, msg: "successful registration" });
+            });
           }
-        })
-        .then((save) => {
-          res.status(200).json({ success: true, msg: "successful registration" });
         })
         .catch((err) =>{
           res.status(500).json({ success: false, msg: "DB Failure", err });
@@ -104,6 +102,7 @@ app.post('/login',(req,res)=>{
       }
 });
 
+/* send over the greater of 1 or the current count times 2 */
 app.get('/increment', (req,res) => {
   const { token, counter } = req.query;
   if(!token || counter === null || counter === undefined){
@@ -120,6 +119,7 @@ app.get('/increment', (req,res) => {
   }
 })
 
+/* update counter document associated with token */
 app.post('/increment',(req,res) => {
   const { token, counter } = req.body;
   /* check if fields are valid */
